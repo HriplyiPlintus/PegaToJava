@@ -21,14 +21,10 @@ public class Main {
         Scanner scanner = new Scanner(System.in);
 
         Boolean shouldExit = false;
-        Boolean tryAgain = false;
-        String userInput = "";
 
         while (!shouldExit) {
-            if (!tryAgain) {
-                System.out.print("Введите команду: ");
-                userInput = scanner.nextLine();
-            }
+            System.out.print("Введите команду: ");
+            String userInput = scanner.nextLine();
 
             switch(userInput.trim().toLowerCase()) {
                 case "add":
@@ -36,10 +32,8 @@ public class Main {
                     String taskTitle = scanner.nextLine();
 
                     if (addTask(taskTitle) == -1) {
-                        tryAgain = true;
-                        continue;
+                        System.out.println("Название не может быть пустым");
                     }
-                    tryAgain = false;
 
                     break;
                 case "delete":
@@ -47,40 +41,51 @@ public class Main {
                     String userProvidedNumber = scanner.nextLine();
 
                     try {
-                        Integer taskNumber = Integer.parseInt(userProvidedNumber);
-                        deleteTask(taskNumber);
-                    } catch (Exception ex) {
-                        if (ex instanceof NumberFormatException) {
-                            System.out.println("Введите число");
-                        } else {
-                            System.out.println(ex.getClass());
-                            System.out.println("Вот такая вот ошибка " + ex.getMessage());
-                        }
-
-                        tryAgain = true;
-                        continue;
+                        int taskNumberToDelete = Integer.parseInt(userProvidedNumber);
+                        deleteTask(taskNumberToDelete);
+                    } catch (NumberFormatException ex) {
+                        System.out.println("Введите число");
+                    } catch (InvalidAttributeValueException ex) {
+                        System.out.println(ex.getMessage());
                     }
-
-                    tryAgain = false;
 
                     break;
                 case "find":
                     System.out.print("Введите номер или название задачи: ");
                     findTask(scanner.nextLine());
+
                     break;
                 case "update":
+                    System.out.print("Введите номер задачи для изменения: ");
+                    String taskNumberToUpdate = scanner.nextLine();
+
+                    try {
+                        int taskNumber = Integer.parseInt(taskNumberToUpdate);
+
+                        System.out.print("Введите новое название: ");
+                        String newTitle = scanner.nextLine();
+
+                        updateTask(taskNumber, newTitle);
+                    } catch (NumberFormatException ex) {
+                        System.out.println("Введите число");
+                    } catch (InvalidAttributeValueException ex) {
+                        System.out.println(ex.getMessage());
+                    }
+
                     break;
                 case "list":
                     printTasks();
+
                     break;
                 case "exit":
                     shouldExit = true;
+
                     break;
                 default:
                     System.out.println("Неопознанная команда");
+
                     break;
             }
-
         }
     }
 
@@ -91,17 +96,20 @@ public class Main {
         }
 
         String[] newTasks = Arrays.copyOf(tasks, tasks.length + 1);
-        newTasks[tasks.length] = title;
+        newTasks[tasks.length] = title.trim();
         tasks = newTasks;
 
         return tasks.length;
     }
 
     static void deleteTask(int number) throws InvalidAttributeValueException {
-        System.out.println("This is the nubmer " + number);
-        number = number - 1;
+        if (tasks.length == 0) {
+            throw new InvalidAttributeValueException("Список пуст, нечего удалять");
+        }
 
-        if (number < 0 || number > tasks.length) {
+        int index = number - 1;
+
+        if (index < 0 || index >= tasks.length) {
             throw new InvalidAttributeValueException("Введите номер от 1 до " + tasks.length);
         }
 
@@ -109,7 +117,7 @@ public class Main {
 
         int j = 0;
         for (int i = 0; i < tasks.length; i++) {
-            if (i == number) {
+            if (i == index) {
                 continue;
             }
 
@@ -119,6 +127,7 @@ public class Main {
 
         tasks = newTasks;
     }
+
     static void findTask(String query) {
         String trimmedQuery = query.trim().toLowerCase();
 
@@ -146,7 +155,30 @@ public class Main {
             System.out.println("Ничего не найдено");
         }
     }
-    static void updateTask(int number, String newTitle) { }
+
+    static void updateTask(int number, String newTitle) throws InvalidAttributeValueException {
+        if (tasks.length == 0) {
+            throw new InvalidAttributeValueException("Список пуст, нечего изменять");
+        }
+
+        int index = number - 1;
+
+        if (index < 0 || index >= tasks.length) {
+            throw new InvalidAttributeValueException("Введите номер от 1 до " + tasks.length);
+        }
+
+        String trimmedTitle = newTitle.trim();
+
+        if (trimmedTitle.isBlank()) {
+            throw new InvalidAttributeValueException("Название не может быть пустым");
+        }
+
+        String oldTitle = tasks[index];
+        tasks[index] = trimmedTitle;
+
+        System.out.println("Задача " + number + " изменена: " + oldTitle + " -> " + trimmedTitle);
+    }
+
     static void printTasks() {
         if (tasks.length == 0) {
             System.out.println("Список пуст");
