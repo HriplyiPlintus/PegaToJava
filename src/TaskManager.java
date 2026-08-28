@@ -1,6 +1,4 @@
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 public class TaskManager {
     private final List<Task> tasks;
@@ -10,7 +8,6 @@ public class TaskManager {
     }
     
     public TaskManager(List<Task> tasks) {
-
         this.tasks = new ArrayList<>(tasks);
     }
 
@@ -31,6 +28,26 @@ public class TaskManager {
         this.tasks.removeIf(t -> t.id.equals(taskId));
 
         return task;
+    }
+
+    public void updateTaskStatus(Integer taskId, String status) {
+        Optional<Task> task = this.findTaskById(taskId);
+        if(!task.isPresent())
+            throw new IllegalArgumentException("Задача с номером " + taskId + " не найдена");
+
+        Status newStatus = null;
+        for(Status s : Status.values()) {
+            if(s.name().equalsIgnoreCase(status.trim())){
+                newStatus = s;
+                break;
+            }
+        }
+
+        if(newStatus == null) {
+            System.out.println("Неизвестный статус: " + status);
+        } else {
+            task.get().status = newStatus;
+        }
     }
 
     public List<Task> findTaskByTitle(String title){
