@@ -1,3 +1,6 @@
+package service;
+
+import model.*;
 import java.util.*;
 
 public class TaskManager {
@@ -32,7 +35,7 @@ public class TaskManager {
 
     public void updateTaskStatus(Integer taskId, String status) {
         Optional<Task> task = this.findTaskById(taskId);
-        if(!task.isPresent())
+        if(!task.isEmpty())
             throw new IllegalArgumentException("Задача с номером " + taskId + " не найдена");
 
         Status newStatus = null;

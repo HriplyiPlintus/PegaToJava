@@ -1,10 +1,12 @@
+package model;
+
 import java.util.concurrent.atomic.AtomicInteger;
 
 public class Task {
     private static final AtomicInteger counter = new AtomicInteger(0);
     public final Integer id;
     public final String title;
-    final String description;
+    public final String description;
     public Status status;
 
     public Task(String title, String description){
@@ -16,12 +18,4 @@ public class Task {
         this.status = Status.New;
         this.id = counter.incrementAndGet();
     }
-}
-
-enum Status {
-    New,
-    ToDo,
-    InProgress,
-    Done,
-    Cancelled
 }

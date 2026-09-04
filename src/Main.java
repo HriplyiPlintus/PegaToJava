@@ -1,4 +1,5 @@
-import javax.management.InvalidAttributeValueException;
+import model.Task;
+import service.TaskManager;
 import java.util.*;
 
 public class Main {
@@ -19,7 +20,7 @@ public class Main {
 
         Scanner scanner = new Scanner(System.in);
 
-        Boolean shouldExit = false;
+        boolean shouldExit = false;
 
         while (!shouldExit) {
             System.out.print("Введите команду: ");
@@ -46,7 +47,7 @@ public class Main {
                     String userProvidedNumber = scanner.nextLine();
 
 
-                    Integer taskNumberToDelete = null;
+                    Integer taskNumberToDelete;
                     try {
                         taskNumberToDelete = Integer.parseInt(userProvidedNumber);
                     } catch (NumberFormatException ex) {
@@ -68,13 +69,12 @@ public class Main {
 
                     List<Task> tasks = taskManager.findTaskByTitle(titleQuery);
 
-                    if(tasks.size() == 0){
+                    if(tasks.isEmpty()){
                         System.out.println("Задач нет");
                         break;
                     }
 
-                    for(int i = 0; i < tasks.size(); i++) {
-                        Task task = tasks.get(i);
+                    for (Task task : tasks) {
                         printTask(task);
                     }
 
