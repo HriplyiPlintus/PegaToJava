@@ -1,5 +1,6 @@
 package model;
 
+import javax.print.DocFlavor;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public class Task {
@@ -17,5 +18,10 @@ public class Task {
         this.description = description;
         this.status = Status.New;
         this.id = counter.incrementAndGet();
+    }
+
+    public Task(String title, String description, String status) {
+        this(title, description);
+        this.status = Status.valueOf(status);
     }
 }

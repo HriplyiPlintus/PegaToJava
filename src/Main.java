@@ -1,9 +1,12 @@
 import model.Task;
+import service.DbTaskManager;
+import service.InMemoryTaskManager;
 import service.TaskManager;
+
 import java.util.*;
 
 public class Main {
-    static TaskManager taskManager = new TaskManager();
+    static TaskManager taskManager = new DbTaskManager();
 
     public static void main(String[] args) {
         System.out.println("""
@@ -40,6 +43,8 @@ public class Main {
                         taskManager.addTask(newTask);
                     } catch (Exception e) {
                         System.out.println(e.getMessage());
+                        e.printStackTrace();
+
                     }
                     break;
                 case "delete":
@@ -118,7 +123,8 @@ public class Main {
     }
 
     static void printTask(Task t) {
-        System.out.println("Задача: " + t.title
+        System.out.println("id: " + t.id
+                + "; Задача: " + t.title
                 + "; Описание: " + t.description
                 + "; Статус: " + t.status);
     }
