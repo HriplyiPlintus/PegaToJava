@@ -37,10 +37,6 @@ public class TaskRepository {
             WHERE id = ?
             """;
 
-    private String url = "jdbc:postgresql://localhost:5432/pega_to_java";
-    private String username = "pega_to_java";   //TODO: вынести в .env
-    private String password = "pega_to_java";
-
     public TaskRepository() {
         createTableIfNotExists();
     }
@@ -70,7 +66,7 @@ public class TaskRepository {
         try(Connection connection = getConnection()){
             PreparedStatement statement = connection.prepareStatement(GET_TASKS_ALL_SQL);
             ResultSet rs = statement.executeQuery();
-            List<SelectTaskDto> tasks = new ArrayList<SelectTaskDto>();
+            List<SelectTaskDto> tasks = new ArrayList<>();
             while (rs.next()) {
                 SelectTaskDto task = new SelectTaskDto(rs.getString("id"),
                         rs.getString("title"),
@@ -108,6 +104,10 @@ public class TaskRepository {
     }
 
     private Connection getConnection() throws SQLException {
+        String password = "pega_to_java";
+        //TODO: вынести в .env
+        String username = "pega_to_java";
+        String url = "jdbc:postgresql://localhost:5432/pega_to_java";
         return DriverManager.getConnection(url, username, password);
     }
 }

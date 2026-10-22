@@ -52,7 +52,7 @@ public class DbTaskManager implements TaskManager {
     public List<Task> getListTasks() {
         try {
             List<SelectTaskDto> tasks = repository.getAllTasks();
-            List<Task> result = new ArrayList<Task>();
+            List<Task> result = new ArrayList<>();
 
             for (SelectTaskDto taskDto : tasks) {
                 result.add(new Task(taskDto.title(), taskDto.description(), taskDto.status()));
