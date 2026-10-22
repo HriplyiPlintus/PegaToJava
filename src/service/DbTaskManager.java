@@ -27,6 +27,11 @@ public class DbTaskManager implements TaskManager {
 
     @Override
     public Optional<Task> removeTask(Integer taskId) {
+        try {
+            this.repository.removeTaskById(taskId);
+        } catch (SQLException e) {
+            throw new RuntimeException(e.getMessage());
+        }
         return Optional.empty();
     }
 

@@ -33,6 +33,11 @@ public class TaskRepository {
             WHERE id = ?
             """;
 
+    private static final String REMOVE_TASK_BY_ID_SQL = """
+            DELETE FROM tasks
+            WHERE id = ?
+            """;
+
     private String url = "jdbc:postgresql://localhost:5432/pega_to_java";
     private String username = "pega_to_java";   //TODO: вынести в .env
     private String password = "pega_to_java";
@@ -89,6 +94,17 @@ public class TaskRepository {
             statement.executeUpdate();
         } catch (SQLException e) {
             throw new RuntimeException("Ошибка обновления статуса задачи");
+        }
+    }
+
+    public void removeTaskById(Integer taskId) throws SQLException {
+        try (Connection connection = getConnection()) {
+            PreparedStatement statement = connection.prepareStatement(REMOVE_TASK_BY_ID_SQL);
+            statement.setInt(1, taskId);
+
+            statement.executeUpdate();
+        } catch (SQLException e) {
+            throw new RuntimeException("Ошибка удаления задачи с id = " + taskId);
         }
     }
 
