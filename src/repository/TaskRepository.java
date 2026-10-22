@@ -6,7 +6,6 @@ import dto.SelectTaskDto;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 public class TaskRepository {
     private static final String CREATE_TABLE_SQL = """

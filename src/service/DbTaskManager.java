@@ -1,6 +1,5 @@
 package service;
 
-import com.sun.source.util.TaskListener;
 import dto.CreateTaskDto;
 import dto.SelectTaskDto;
 import model.Task;
@@ -15,20 +14,20 @@ public class DbTaskManager implements TaskManager {
     private static TaskRepository repository;
 
     public DbTaskManager () {
-        this.repository = new TaskRepository();
+        repository = new TaskRepository();
     }
 
     @Override
     public boolean addTask(Task task) {
         CreateTaskDto taskDto = new CreateTaskDto(task.title, task.description, task.status.toString());
-        this.repository.createTask(taskDto);
+        repository.createTask(taskDto);
         return true;
     }
 
     @Override
     public Optional<Task> removeTask(Integer taskId) {
         try {
-            this.repository.removeTaskById(taskId);
+            repository.removeTaskById(taskId);
         } catch (SQLException e) {
             throw new RuntimeException(e.getMessage());
         }
@@ -38,7 +37,7 @@ public class DbTaskManager implements TaskManager {
     @Override
     public void updateTaskStatus(Integer taskId, String status) {
         try {
-            this.repository.updateTaskStatus(taskId, status);
+            repository.updateTaskStatus(taskId, status);
         } catch (SQLException e) {
             throw new RuntimeException(e.getMessage());
         }
@@ -52,7 +51,7 @@ public class DbTaskManager implements TaskManager {
     @Override
     public List<Task> getListTasks() {
         try {
-            List<SelectTaskDto> tasks = this.repository.getAllTasks();
+            List<SelectTaskDto> tasks = repository.getAllTasks();
             List<Task> result = new ArrayList<Task>();
 
             for (SelectTaskDto taskDto : tasks) {
