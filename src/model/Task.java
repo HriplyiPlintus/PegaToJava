@@ -1,8 +1,5 @@
 package model;
 
-import javax.print.DocFlavor;
-import java.util.concurrent.atomic.AtomicInteger;
-
 public class Task {
     public final Integer id;
     public final String title;

@@ -1,6 +1,5 @@
 import model.Task;
 import service.DbTaskManager;
-import service.InMemoryTaskManager;
 import service.TaskManager;
 
 import java.util.*;
@@ -8,7 +7,7 @@ import java.util.*;
 public class Main {
     static TaskManager taskManager = new DbTaskManager();
 
-    public static void main(String[] args) {
+    static void main(String[] args) {
         System.out.println("""
                 Менеджер задач
                 

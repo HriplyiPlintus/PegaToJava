@@ -148,13 +148,11 @@ public class TaskRepository {
 
             ResultSet rs = statement.executeQuery();
             while(rs.next()) {
-                SelectTaskDto task = new SelectTaskDto(
+                return new SelectTaskDto(
                         rs.getString("id"),
                         rs.getString("title"),
                         rs.getString("description"),
                         rs.getString("status"));
-
-                return task;
             }
 
             throw new RuntimeException("Задач с id = " + id + " не найдено");
