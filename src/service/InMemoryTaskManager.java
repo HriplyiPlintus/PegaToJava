@@ -2,9 +2,11 @@ package service;
 
 import model.*;
 import java.util.*;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class InMemoryTaskManager implements TaskManager {
     private final List<Task> tasks;
+    private static final AtomicInteger counter = new AtomicInteger(0);
 
     public InMemoryTaskManager() {
         this(new ArrayList<>());
@@ -15,15 +17,15 @@ public class InMemoryTaskManager implements TaskManager {
     }
 
     @Override
-    public boolean addTask(Task task) {
+    public boolean addTask(String title, String description) {
         Optional<Task> existingTask = this.tasks.stream()
-                .filter(t -> t.title.equals(task.title))
+                .filter(t -> t.title.equals(title))
                 .findFirst();
 
         if (existingTask.isPresent())
             return false;
 
-        tasks.add(task);
+        tasks.add(new Task(counter.incrementAndGet(), title, description));
         return true;
     }
 
@@ -38,7 +40,7 @@ public class InMemoryTaskManager implements TaskManager {
     @Override
     public void updateTaskStatus(Integer taskId, String status) {
         Optional<Task> task = this.findTaskById(taskId);
-        if(!task.isEmpty())
+        if(task.isEmpty())
             throw new IllegalArgumentException("Задача с номером " + taskId + " не найдена");
 
         Status newStatus = null;
@@ -57,7 +59,7 @@ public class InMemoryTaskManager implements TaskManager {
     }
 
     @Override
-    public List<Task> findTaskByTitle(String title){
+    public List<Task> findTasksByTitle(String title){
         if (title.isBlank())
             return List.of();
 

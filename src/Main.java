@@ -38,13 +38,9 @@ public class Main {
                     String taskDescription = scanner.nextLine().trim();
 
                     try {
-                        Task newTask = new Task(taskTitle, taskDescription);
-
-                        taskManager.addTask(newTask);
+                        taskManager.addTask(taskTitle, taskDescription);
                     } catch (Exception e) {
                         System.out.println(e.getMessage());
-                        e.printStackTrace();
-
                     }
                     break;
                 case "delete":
@@ -52,7 +48,7 @@ public class Main {
                     String userProvidedNumber = scanner.nextLine();
 
 
-                    Integer taskNumberToDelete;
+                    int taskNumberToDelete;
                     try {
                         taskNumberToDelete = Integer.parseInt(userProvidedNumber);
                     } catch (NumberFormatException ex) {
@@ -72,7 +68,7 @@ public class Main {
                     System.out.print("Введите название задачи: ");
                     String titleQuery = scanner.nextLine();
 
-                    List<Task> tasks = taskManager.findTaskByTitle(titleQuery);
+                    List<Task> tasks = taskManager.findTasksByTitle(titleQuery);
 
                     if(tasks.isEmpty()){
                         System.out.println("Задач нет");

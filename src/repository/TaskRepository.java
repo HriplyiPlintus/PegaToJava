@@ -25,6 +25,11 @@ public class TaskRepository {
             SELECT *
             FROM tasks
             """;
+    private static final String GET_TASKS_BY_TITLE_SQL = """
+            SELECT *
+            FROM tasks
+            WHERE lower(title) like ?
+            """;
 
     private static final String UPDATE_TASK_STATUS_SQL = """
             UPDATE tasks
@@ -37,12 +42,18 @@ public class TaskRepository {
             WHERE id = ?
             """;
 
+    private static final String GET_TASK_BY_ID_SQL = """
+            SELECT *
+            FROM tasks
+            WHERE id = ?
+            """;
+
     public TaskRepository() {
         createTableIfNotExists();
     }
 
     private void createTableIfNotExists() {
-        try(Connection connection = getConnection()) {
+        try (Connection connection = getConnection()) {
             Statement statement = connection.createStatement();
             statement.executeUpdate(CREATE_TABLE_SQL);
         } catch (SQLException e) {
@@ -51,7 +62,7 @@ public class TaskRepository {
     }
 
     public void createTask(CreateTaskDto task) {
-        try(Connection connection = getConnection()) {
+        try (Connection connection = getConnection()) {
             PreparedStatement statement = connection.prepareStatement(CREATE_TASK_SQL);
             statement.setString(1, task.title());
             statement.setString(2, task.description());
@@ -63,7 +74,7 @@ public class TaskRepository {
     }
 
     public List<SelectTaskDto> getAllTasks() throws SQLException {
-        try(Connection connection = getConnection()){
+        try (Connection connection = getConnection()) {
             PreparedStatement statement = connection.prepareStatement(GET_TASKS_ALL_SQL);
             ResultSet rs = statement.executeQuery();
             List<SelectTaskDto> tasks = new ArrayList<>();
@@ -76,7 +87,7 @@ public class TaskRepository {
             }
             return tasks;
         } catch (SQLException e) {
-            throw new RuntimeException("Ошибка получения списка задач");
+            throw new RuntimeException("Ошибка получения списка задач", e);
         }
     }
 
@@ -88,18 +99,69 @@ public class TaskRepository {
 
             statement.executeUpdate();
         } catch (SQLException e) {
-            throw new RuntimeException("Ошибка обновления статуса задачи");
+            throw new RuntimeException("Ошибка обновления статуса задачи", e);
         }
     }
 
-    public void removeTaskById(Integer taskId) throws SQLException {
+    public SelectTaskDto removeTaskById(Integer taskId) throws SQLException {
         try (Connection connection = getConnection()) {
+            SelectTaskDto taskToRemove = getTaskById(taskId);
             PreparedStatement statement = connection.prepareStatement(REMOVE_TASK_BY_ID_SQL);
             statement.setInt(1, taskId);
 
             statement.executeUpdate();
+            return taskToRemove;
         } catch (SQLException e) {
-            throw new RuntimeException("Ошибка удаления задачи с id = " + taskId);
+            throw new RuntimeException("Ошибка удаления задачи с id = " + taskId, e);
+        } catch (RuntimeException e) {
+            throw e;
+        }
+    }
+
+    public List<SelectTaskDto> findTasksByTitle(String title) {
+        try (Connection connection = getConnection()) {
+            PreparedStatement statement = connection.prepareStatement(GET_TASKS_BY_TITLE_SQL);
+            statement.setString(1, "%" + title.toLowerCase() + "%");
+
+            List<SelectTaskDto> result = new ArrayList<>();
+            ResultSet rs = statement.executeQuery();
+            while (rs.next()) {
+                SelectTaskDto task = new SelectTaskDto(
+                        rs.getString("id"),
+                        rs.getString("title"),
+                        rs.getString("description"),
+                        rs.getString("status"));
+
+                result.add(task);
+            }
+
+            return result;
+        } catch (SQLException e) {
+            throw new RuntimeException("Ошибка получения списка задач по названию", e);
+        }
+    }
+
+    private SelectTaskDto getTaskById(Integer id) {
+        try (Connection connection = getConnection()) {
+            PreparedStatement statement = connection.prepareStatement(GET_TASK_BY_ID_SQL);
+            statement.setString(1, id.toString());
+
+            ResultSet rs = statement.executeQuery();
+            while(rs.next()) {
+                SelectTaskDto task = new SelectTaskDto(
+                        rs.getString("id"),
+                        rs.getString("title"),
+                        rs.getString("description"),
+                        rs.getString("status"));
+
+                return task;
+            }
+
+            throw new RuntimeException("Задач с id = " + id + " не найдено");
+        } catch (SQLException e) {
+            throw new RuntimeException("Не удалось получить задачу с id = " + id, e);
+        } catch (RuntimeException e) {
+            throw e;
         }
     }
 

@@ -2,6 +2,7 @@ package service;
 
 import dto.CreateTaskDto;
 import dto.SelectTaskDto;
+import model.Status;
 import model.Task;
 import repository.TaskRepository;
 
@@ -11,15 +12,15 @@ import java.util.List;
 import java.util.Optional;
 
 public class DbTaskManager implements TaskManager {
-    private static TaskRepository repository;
+    private final TaskRepository repository;
 
     public DbTaskManager () {
         repository = new TaskRepository();
     }
 
     @Override
-    public boolean addTask(Task task) {
-        CreateTaskDto taskDto = new CreateTaskDto(task.title, task.description, task.status.toString());
+    public boolean addTask(String title, String description) {
+        CreateTaskDto taskDto = new CreateTaskDto(title, description, Status.New.toString());
         repository.createTask(taskDto);
         return true;
     }
@@ -27,11 +28,17 @@ public class DbTaskManager implements TaskManager {
     @Override
     public Optional<Task> removeTask(Integer taskId) {
         try {
-            repository.removeTaskById(taskId);
+            SelectTaskDto removedTask = repository.removeTaskById(taskId);
+            return Optional.of(new Task(
+                    Integer.parseInt(removedTask.id()),
+                    removedTask.title(),
+                    removedTask.description(),
+                    removedTask.status()));
         } catch (SQLException e) {
-            throw new RuntimeException(e.getMessage());
+            throw new RuntimeException(e.getMessage(), e);
+        } catch (RuntimeException e) {
+            throw e;
         }
-        return Optional.empty();
     }
 
     @Override
@@ -39,28 +46,41 @@ public class DbTaskManager implements TaskManager {
         try {
             repository.updateTaskStatus(taskId, status);
         } catch (SQLException e) {
-            throw new RuntimeException(e.getMessage());
+            throw new RuntimeException(e.getMessage(), e);
         }
     }
 
     @Override
-    public List<Task> findTaskByTitle(String title) {
-        return List.of();
+    public List<Task> findTasksByTitle(String title) {
+        List<Task> result = new ArrayList<>();
+
+        try {
+            List<SelectTaskDto> tasks = repository.findTasksByTitle(title);
+            for (SelectTaskDto t : tasks) {
+                result.add(new Task(Integer.parseInt(t.id()), t.title(), t.description(), t.status()));
+            }
+        } catch (Exception e) {
+            throw new RuntimeException(e.getMessage(), e);
+        }
+
+        return result;
     }
 
     @Override
     public List<Task> getListTasks() {
+        List<Task> result = new ArrayList<>();
+
         try {
             List<SelectTaskDto> tasks = repository.getAllTasks();
-            List<Task> result = new ArrayList<>();
 
             for (SelectTaskDto taskDto : tasks) {
-                result.add(new Task(taskDto.title(), taskDto.description(), taskDto.status()));
+                result.add(new Task(Integer.parseInt(taskDto.id()), taskDto.title(), taskDto.description(), taskDto.status()));
             }
 
-            return result;
         } catch (SQLException e) {
-            throw new RuntimeException(e.getMessage());
+            throw new RuntimeException(e.getMessage(), e);
         }
+
+        return result;
     }
 }
