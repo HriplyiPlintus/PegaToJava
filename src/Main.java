@@ -1,11 +1,13 @@
 import model.Task;
+import service.DbTaskManager;
 import service.TaskManager;
+
 import java.util.*;
 
 public class Main {
-    static TaskManager taskManager = new TaskManager();
+    static TaskManager taskManager = new DbTaskManager();
 
-    public static void main(String[] args) {
+    static void main(String[] args) {
         System.out.println("""
                 Менеджер задач
                 
@@ -35,9 +37,7 @@ public class Main {
                     String taskDescription = scanner.nextLine().trim();
 
                     try {
-                        Task newTask = new Task(taskTitle, taskDescription);
-
-                        taskManager.addTask(newTask);
+                        taskManager.addTask(taskTitle, taskDescription);
                     } catch (Exception e) {
                         System.out.println(e.getMessage());
                     }
@@ -47,7 +47,7 @@ public class Main {
                     String userProvidedNumber = scanner.nextLine();
 
 
-                    Integer taskNumberToDelete;
+                    int taskNumberToDelete;
                     try {
                         taskNumberToDelete = Integer.parseInt(userProvidedNumber);
                     } catch (NumberFormatException ex) {
@@ -67,7 +67,7 @@ public class Main {
                     System.out.print("Введите название задачи: ");
                     String titleQuery = scanner.nextLine();
 
-                    List<Task> tasks = taskManager.findTaskByTitle(titleQuery);
+                    List<Task> tasks = taskManager.findTasksByTitle(titleQuery);
 
                     if(tasks.isEmpty()){
                         System.out.println("Задач нет");
@@ -118,7 +118,8 @@ public class Main {
     }
 
     static void printTask(Task t) {
-        System.out.println("Задача: " + t.title
+        System.out.println("id: " + t.id
+                + "; Задача: " + t.title
                 + "; Описание: " + t.description
                 + "; Статус: " + t.status);
     }
